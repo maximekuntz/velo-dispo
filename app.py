@@ -49,32 +49,33 @@ def get_station_information_feed(feeds: dict):
 def get_station_status_feed(feeds: dict):
     return get_specific_feed(feeds, "station_status")
 
-city = st.selectbox("Choisir une ville", list(GBFS_URLS.keys()))
-gbfs_url = GBFS_URLS[city]
-feeds = get_feed(url=gbfs_url)
+with st.sidebar:
+    city = st.selectbox("Choisir une ville", list(GBFS_URLS.keys()))
 
-system_information_url = get_system_information_feed(feeds)
-system_information = requests.get(system_information_url).json()
+    gbfs_url = GBFS_URLS[city]
+    feeds = get_feed(url=gbfs_url)
 
-station_information_url = get_station_information_feed(feeds)
-station_information = requests.get(station_information_url).json()
-station_information_df = pd.DataFrame(station_information["data"]["stations"])
-print(station_information_df)
+    system_information_url = get_system_information_feed(feeds)
+    system_information = requests.get(system_information_url).json()
 
-station_status_url = get_station_status_feed(feeds)
-station_status = requests.get(station_status_url).json()
-station_status_df = pd.DataFrame(station_status["data"]["stations"])
-print(station_status_df)
+    station_information_url = get_station_information_feed(feeds)
+    station_information = requests.get(station_information_url).json()
+    station_information_df = pd.DataFrame(station_information["data"]["stations"])
 
-col1, col2, col3 = st.columns([2, 2, 1])
-col1.metric("Réseau", system_information["data"]["name"])
-with col2:
-    st.write(f"Nous récupérons les données en temps réel des stations de vélos en libre-service à partir de l'URL suivante : {gbfs_url}")
+    station_status_url = get_station_status_feed(feeds)
+    station_status = requests.get(station_status_url).json()
+    station_status_df = pd.DataFrame(station_status["data"]["stations"])
+
+    st.metric("Réseau", system_information["data"]["name"])
+    st.metric("Nombre de stations", len(station_information["data"]["stations"]))
+
+    st.divider()
+
+    st.write(f"Nous récupérons les données en temps réel des stations de vélos en libre-service [ici]({gbfs_url}).")
     operator = system_information.get("data").get("operator")
     operator_msg = f" sont fournies par {operator} et" if operator else ""
     st.write(f"Les données{operator_msg} sont mises à jour toutes les {system_information['ttl']} secondes.")
     st.write(f"Dernière actualisation : {pd.to_datetime(station_information.get('last_updated'), unit='s')}")
-col3.metric("Nombre de stations", len(station_information["data"]["stations"]))
 
 
 station_name = st.selectbox("Choisir une station", station_information_df["name"])
