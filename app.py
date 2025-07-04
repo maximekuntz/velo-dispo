@@ -13,6 +13,7 @@ GBFS_URLS = {
     "Brest": "https://gbfs.partners.fifteen.eu/gbfs/2.2/brest/en/gbfs.json",
     "Carcassonne": "https://api.gbfs.ecovelo.mobi/cyclolibre/gbfs.json",
     "Lille": "https://media.ilevia.fr/opendata/gbfs.json",
+    "Montpellier": "https://montpellier-fr.fifteen.site/gbfs/gbfs.json",
     "Mulhouse": "https://api.cyclocity.fr/contracts/mulhouse/gbfs/gbfs.json",
     "Nancy": "https://api.cyclocity.fr/contracts/nancy/gbfs/gbfs.json",
     "Nantes": "https://api.cyclocity.fr/contracts/nantes/gbfs/gbfs.json",
