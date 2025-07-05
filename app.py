@@ -2,6 +2,8 @@ import pandas as pd
 import requests
 import streamlit as st
 
+from feed import *
+
 
 GBFS_URLS = {
     "Rennes": "https://eu.ftp.opendatasoft.com/star/gbfs/gbfs.json",
@@ -47,38 +49,6 @@ def get_feed(url: str):
         return data["feeds"]
     language_key = list(data.keys())[0]
     return data[language_key]["feeds"]
-
-
-def get_specific_feed(feeds: dict, feed_name: str):
-    for feed in feeds:
-        if feed["name"] == feed_name:
-            return feed["url"]
-    raise ValueError(f"No '{feed_name}' feed found")
-
-
-def get_system_information_feed(feeds: dict):
-    return get_specific_feed(feeds, "system_information")
-
-
-def get_language_text(texts: list[dict] | str, language: str | None = None):
-    if type(texts) is str:
-        print("Not a list, returning value.")
-        return texts
-
-    if language is None:
-        return texts[0]["text"]
-    for name in texts:
-        if name["language"] == language:
-            return name["text"]
-    raise ValueError(f"No text found for language '{language}'")
-
-
-def get_station_information_feed(feeds: dict):
-    return get_specific_feed(feeds, "station_information")
-
-
-def get_station_status_feed(feeds: dict):
-    return get_specific_feed(feeds, "station_status")
 
 
 with st.sidebar:
