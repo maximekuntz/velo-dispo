@@ -1,4 +1,4 @@
-import logging
+from logger import logger
 
 
 def get_specific_feed(feeds: dict, feed_name: str) -> str:
@@ -25,7 +25,7 @@ def get_language_text(texts: list[dict] | str, language: str | None = None) -> s
         return texts
 
     if language is None:
-        logging.debug("No language specified, returning first found.")
+        logger.debug("No language specified, returning first found.")
         return texts[0]["text"]
     for name in texts:
         if name["language"] == language:
