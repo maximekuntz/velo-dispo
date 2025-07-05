@@ -1,8 +1,11 @@
 import pandas as pd
 import requests
 import streamlit as st
+from streamlit_js_eval import get_geolocation
 
 from feed import *
+from logger import logger
+import utils
 
 
 GBFS_URLS = {
@@ -52,6 +55,32 @@ def get_feed(url: str):
     return data[language_key]["feeds"]
 
 
+@st.fragment
+def display_station_location(station_info: dict):
+    if "distance_km" in station_info:
+        distance = station_info["distance_km"]
+        st.write(f"Distance : {distance:.2f} km")
+    if "address" in station_info:
+        address = station_info["address"]
+        st.write(f"Adresse : {address}")
+    latitude, longitude = station_info["lat"], station_info["lon"]
+    st.write(f"Coordonnées : {latitude}, {longitude}")
+
+
+@st.fragment
+def display_station_metrics(station_information: dict, station_status: dict):
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        capacity = station_information["capacity"]
+        st.metric("Capacité totale", capacity)
+    with col2:
+        num_bikes_available = station_status["num_bikes_available"]
+        st.metric(":bike: Vélos disponibles", num_bikes_available)
+    with col3:
+        num_docks_available = station_status["num_docks_available"]
+        st.metric(":parking: Places libres", num_docks_available)
+
+
 with st.sidebar:
     city = st.selectbox("Choisir une ville", list(GBFS_URLS.keys()))
 
@@ -85,31 +114,45 @@ with st.sidebar:
         pass
 
 station_information_df_names = station_information_df["name"].apply(get_language_text)
-station_name = st.selectbox("Choisir une station", station_information_df_names)
-station_id = station_information_df[station_information_df_names == station_name]["station_id"].values[0]
 
-station_information_selected = station_information_df[station_information_df["station_id"] == station_id]
-station_status_selected = station_status_df[station_status_df["station_id"] == station_id]
-
+station_selection_cols = st.columns(2)
+with station_selection_cols[0]:
+    # Selection in a list
+    station_name = st.selectbox("Choisir une station", station_information_df_names)
+    station_id = station_information_df[station_information_df_names == station_name].to_dict(orient="records")[0][
+        "station_id"
+    ]
+    selected_station_information = station_information_df[station_information_df["station_id"] == station_id].to_dict(
+        orient="records"
+    )[0]
+with station_selection_cols[1]:
+    # Selection of the closest station
+    if st.button("Station la plus proche", key="geolocation_button", use_container_width=True):
+        geolocation = get_geolocation(component_key="user_location")
+        logger.debug(f"Geolocation data: {geolocation}")
+        if not geolocation:
+            st.toast("Autorisez l'accès à votre position pour utiliser cette fonctionnalité.", icon="⚠️")
+        else:
+            user_lat = geolocation["coords"]["latitude"]
+            user_lon = geolocation["coords"]["longitude"]
+            st.write(f"Votre position est : {user_lat}, {user_lon}.")
+            station_information_df["distance_km"] = station_information_df.apply(
+                lambda row: utils.distance_haversine(user_lat, user_lon, row["lat"], row["lon"]),
+                axis=1,
+            )
+            selected_station_information = station_information_df.loc[
+                station_information_df["distance_km"].idxmin()
+            ].to_dict()
+            logger.debug("Station la plus proche :", selected_station_information)
+            station_name = get_language_text(selected_station_information["name"])
+            station_id = selected_station_information["station_id"]
 
 col1, col2 = st.columns(2)
 with col1:
     st.write(f"Vous avez choisi la station **{station_name.strip()}** (id : {station_id})")
 with col2:
-    if "address" in station_information_selected.columns:
-        address = station_information_selected["address"].values[0]
-        st.write(f"Adresse : {address}")
-    latitude = station_information_selected["lat"].values[0]
-    longitude = station_information_selected["lon"].values[0]
-    st.write(f"Coordonnées : {latitude}, {longitude}")
+    display_station_location(station_info=selected_station_information)
 
-col1, col2, col3 = st.columns(3)
-with col1:
-    capacity = station_information_selected["capacity"].values[0]
-    st.metric("Capacité totale", capacity)
-with col2:
-    num_bikes_available = station_status_selected["num_bikes_available"].values[0]
-    st.metric(":bike: Vélos disponibles", num_bikes_available)
-with col3:
-    num_docks_available = station_status_selected["num_docks_available"].values[0]
-    st.metric(":parking: Places libres", num_docks_available)
+# Show availability
+selected_station_status = station_status_df[station_status_df["station_id"] == station_id].to_dict(orient="records")[0]
+display_station_metrics(station_information=selected_station_information, station_status=selected_station_status)
