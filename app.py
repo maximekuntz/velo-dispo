@@ -51,7 +51,9 @@ def display_station_metrics(station_information: dict, station_status: dict):
         capacity = station_information["capacity"]
         st.metric("Capacité totale", capacity)
     with col2:
-        num_bikes_available = station_status["num_bikes_available"]
+        num_bikes_available = station_status.get("num_bikes_available", None)
+        if num_bikes_available is None:
+            num_bikes_available = station_status.get("num_vehicles_available")
         st.metric(":bike: Vélos disponibles", num_bikes_available)
 
         # Deduplicate and prioritize vehicle type data sources
