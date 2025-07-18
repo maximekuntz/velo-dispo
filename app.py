@@ -51,8 +51,41 @@ def display_station_metrics(station_information: dict, station_status: dict):
         capacity = station_information["capacity"]
         st.metric("Capacité totale", capacity)
     with col2:
-        num_bikes_available = station_status["num_bikes_available"]
+        num_bikes_available = station_status.get("num_bikes_available", None)
+        if num_bikes_available is None:
+            num_bikes_available = station_status.get("num_vehicles_available")
         st.metric(":bike: Vélos disponibles", num_bikes_available)
+
+        # Deduplicate and prioritize vehicle type data sources
+        count_by_type = None
+        expander_label = ""
+        if station_status.get("vehicle_types_available"):
+            count_by_type = station_status["vehicle_types_available"]
+            expander_label = "Types de véhicules disponibles"
+            def iter_types():
+                for type_count in count_by_type:
+                    vehicle_type = type_count["vehicle_type_id"]
+                    vehicle_qty = type_count["count"]
+                    yield vehicle_type, vehicle_qty
+        elif station_status.get("num_bikes_available_types"):
+            count_by_type = station_status["num_bikes_available_types"]
+            expander_label = "Types de vélos disponibles"
+            def iter_types():
+                for elt in count_by_type:
+                    for vehicle_type, vehicle_qty in elt.items():
+                        yield vehicle_type, vehicle_qty
+        else:
+            def iter_types():
+                return
+                yield
+
+        if count_by_type:
+            with st.expander(expander_label, expanded=False):
+                for vehicle_type, vehicle_qty in iter_types():
+                    icon = "⚡" if utils.is_electric_bike(vehicle_type) else ""
+                    if vehicle_qty > 0:
+                        st.metric(label=f"{icon}{vehicle_type}", value=vehicle_qty)
+
     with col3:
         num_docks_available = station_status["num_docks_available"]
         st.metric(":parking: Places libres", num_docks_available)
