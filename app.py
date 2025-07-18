@@ -4,33 +4,10 @@ import streamlit as st
 from streamlit_js_eval import get_geolocation
 
 from feed import *
+from feeds_urls import GBFS_URLS
 from logger import logger
 import utils
 
-
-GBFS_URLS = {
-    "Rennes": "https://eu.ftp.opendatasoft.com/star/gbfs/gbfs.json",
-    "Paris et communes limitrophes": "https://velib-metropole-opendata.smovengo.cloud/opendata/Velib_Metropole/gbfs.json",
-    "Lyon": "https://download.data.grandlyon.com/files/rdata/jcd_jcdecaux.jcdvelov/gbfs.json",
-    "Marseille": "https://api.omega.fifteen.eu/gbfs/2.2/marseille/en/gbfs.json?&key=MjE0ZDNmMGEtNGFkZS00M2FlLWFmMWItZGNhOTZhMWQyYzM2",
-    "Agen": "https://api.gbfs.ecovelo.mobi/tempovelo/gbfs.json",
-    "Bordeaux": "https://bdx.mecatran.com/utw/ws/gbfs/bordeaux/v3/gbfs.json?apiKey=opendata-bordeaux-metropole-flux-gtfs-rt",
-    "Brest": "https://gbfs.partners.fifteen.eu/gbfs/2.2/brest/en/gbfs.json",
-    "Carcassonne": "https://api.gbfs.ecovelo.mobi/cyclolibre/gbfs.json",
-    "Lille": "https://media.ilevia.fr/opendata/gbfs.json",
-    "Montpellier": "https://montpellier-fr.fifteen.site/gbfs/gbfs.json",
-    "Mulhouse": "https://api.cyclocity.fr/contracts/mulhouse/gbfs/gbfs.json",
-    "Nancy": "https://api.cyclocity.fr/contracts/nancy/gbfs/gbfs.json",
-    "Nantes": "https://api.cyclocity.fr/contracts/nantes/gbfs/gbfs.json",
-    "Niort": "https://api.gbfs.ecovelo.mobi/tanlib/gbfs.json",
-    "Saint-Brieuc": "https://gateway.prod.partners-fs37hd8.zoov.site/gbfs/2.2/saintbrieuc/en/gbfs.json?key=YmE1ZDVlNDYtMGIwNy00MGEyLWIxZWYtNGEwOGQ4NTYxNTYz",
-    "Strasbourg": "https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_ae/gbfs.json",
-    "Tarbes": "https://api.gbfs.ecovelo.mobi/tlpmobilites/gbfs.json",
-    "Epinal": "https://gbfs.partners.fifteen.eu/gbfs/epinal/gbfs.json",
-    "La Bresse Gérardmer": "https://api.gbfs.v3.0.ecovelo.mobi/labresse/gbfs.json",
-    "Valenciennes": "https://stables.donkey.bike/api/public/gbfs/2/donkey_valenciennes/gbfs",
-    "Vichy": "https://gbfs.partners.fifteen.eu/gbfs/vichy/gbfs.json",
-}
 
 st.set_page_config(
     page_title="Vélo Dispo",
