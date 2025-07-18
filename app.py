@@ -4,6 +4,7 @@ import streamlit as st
 from streamlit_js_eval import get_geolocation
 
 from feed import *
+from feeds_urls import GBFS_URLS
 from logger import logger
 import utils
 
