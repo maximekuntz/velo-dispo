@@ -11,3 +11,10 @@ def distance_haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> fl
 
     d = np.sin((lat2 - lat1) / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin((lon2 - lon1) / 2) ** 2
     return 2 * R * np.arcsin(np.sqrt(d))
+
+
+def is_electric_bike(vehicle_type: str) -> bool:
+    """
+    Check if the vehicle type is an electric bike.
+    """
+    return vehicle_type.lower() in ["ebike", "electric_bike", "e-bike", "e bike", "electric", "electrical"]
