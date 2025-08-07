@@ -24,7 +24,7 @@ def get_language_text(texts: list[dict] | str, language: str | None = None) -> s
     if not texts:
         logger.error("No texts provided, returning empty string.")
         raise ValueError("No texts provided")
-    
+
     if type(texts) is str:  # No alternatives for languages
         return texts
 

@@ -61,19 +61,24 @@ def display_station_metrics(station_information: dict, station_status: dict):
         if station_status.get("vehicle_types_available"):
             count_by_type = station_status["vehicle_types_available"]
             expander_label = "Types de véhicules disponibles"
+
             def iter_types():
                 for type_count in count_by_type:
                     vehicle_type = type_count["vehicle_type_id"]
                     vehicle_qty = type_count["count"]
                     yield vehicle_type, vehicle_qty
+
         elif station_status.get("num_bikes_available_types"):
             count_by_type = station_status["num_bikes_available_types"]
             expander_label = "Types de vélos disponibles"
+
             def iter_types():
                 for elt in count_by_type:
                     for vehicle_type, vehicle_qty in elt.items():
                         yield vehicle_type, vehicle_qty
+
         else:
+
             def iter_types():
                 return
                 yield
@@ -127,10 +132,20 @@ station_information_df_names = st.session_state.station_information_df["name"].a
 station_selection_cols = st.columns(2)
 with station_selection_cols[0]:
     # Selection in a list
-    station_name = st.selectbox("Choisir une station", options= station_information_df_names, key = "station_name", on_change=cb.update_selected_station_from_list)
+    station_name = st.selectbox(
+        "Choisir une station",
+        options=station_information_df_names,
+        key="station_name",
+        on_change=cb.update_selected_station_from_list,
+    )
 with station_selection_cols[1]:
     # Selection of the closest station
-    st.button("Station la plus proche", key="geolocation_button", use_container_width=True, on_click=cb.update_selected_station_from_geolocation)
+    st.button(
+        "Station la plus proche",
+        key="geolocation_button",
+        use_container_width=True,
+        on_click=cb.update_selected_station_from_geolocation,
+    )
 
 station_id = st.session_state.station_id
 selected_station_information = st.session_state.selected_station_information
@@ -142,5 +157,7 @@ with col2:
     display_station_location(station_info=selected_station_information)
 
 # Show availability
-selected_station_status = st.session_state.station_status_df[st.session_state.station_status_df["station_id"] == station_id].to_dict(orient="records")[0]
+selected_station_status = st.session_state.station_status_df[
+    st.session_state.station_status_df["station_id"] == station_id
+].to_dict(orient="records")[0]
 display_station_metrics(station_information=selected_station_information, station_status=selected_station_status)

@@ -10,12 +10,9 @@ def update_selected_station_from_list():
     st.session_state.station_id = st.session_state.station_information_df[
         st.session_state.station_information_df_names == st.session_state.station_name
     ].to_dict(orient="records")[0]["station_id"]
-    st.session_state.selected_station_information = (
-        st.session_state.station_information_df[
-            st.session_state.station_information_df["station_id"]
-            == st.session_state.station_id
-        ].to_dict(orient="records")[0]
-    )
+    st.session_state.selected_station_information = st.session_state.station_information_df[
+        st.session_state.station_information_df["station_id"] == st.session_state.station_id
+    ].to_dict(orient="records")[0]
 
 
 def update_selected_station_from_geolocation():
@@ -30,25 +27,13 @@ def update_selected_station_from_geolocation():
         user_lat = geolocation["coords"]["latitude"]
         user_lon = geolocation["coords"]["longitude"]
         st.write(f"Votre position est : {user_lat}, {user_lon}.")
-        st.session_state.station_information_df["distance_km"] = (
-            st.session_state.station_information_df.apply(
-                lambda row: utils.distance_haversine(
-                    user_lat, user_lon, row["lat"], row["lon"]
-                ),
-                axis=1,
-            )
+        st.session_state.station_information_df["distance_km"] = st.session_state.station_information_df.apply(
+            lambda row: utils.distance_haversine(user_lat, user_lon, row["lat"], row["lon"]),
+            axis=1,
         )
-        st.session_state.selected_station_information = (
-            st.session_state.station_information_df.loc[
-                st.session_state.station_information_df["distance_km"].idxmin()
-            ].to_dict()
-        )
-        logger.debug(
-            "Station la plus proche :", st.session_state.selected_station_information
-        )
-        st.session_state.station_name = get_language_text(
-            st.session_state.selected_station_information["name"]
-        )
-        st.session_state.station_id = st.session_state.selected_station_information[
-            "station_id"
-        ]
+        st.session_state.selected_station_information = st.session_state.station_information_df.loc[
+            st.session_state.station_information_df["distance_km"].idxmin()
+        ].to_dict()
+        logger.debug("Station la plus proche :", st.session_state.selected_station_information)
+        st.session_state.station_name = get_language_text(st.session_state.selected_station_information["name"])
+        st.session_state.station_id = st.session_state.selected_station_information["station_id"]
