@@ -95,6 +95,11 @@ def display_station_metrics(station_information: dict, station_status: dict):
         st.metric(":parking: Places libres", num_docks_available)
 
 
+if "station_id" not in st.session_state:
+    st.session_state["station_id"] = None
+if "station_information_df_names" not in st.session_state:
+    st.session_state["station_information_df_names"] = None
+
 with st.sidebar:
     city = st.selectbox("Choisir une ville", list(GBFS_URLS.keys()), key="city")
 
@@ -127,14 +132,14 @@ with st.sidebar:
     except:
         pass
 
-station_information_df_names = st.session_state.station_information_df["name"].apply(get_language_text)
+st.session_state.station_information_df_names = st.session_state.station_information_df["name"].apply(get_language_text)
 
 station_selection_cols = st.columns(2)
 with station_selection_cols[0]:
     # Selection in a list
     station_name = st.selectbox(
         "Choisir une station",
-        options=station_information_df_names,
+        options=st.session_state.station_information_df_names,
         key="station_name",
         on_change=cb.update_selected_station_from_list,
     )
@@ -147,17 +152,18 @@ with station_selection_cols[1]:
         on_click=cb.update_selected_station_from_geolocation,
     )
 
-station_id = st.session_state.station_id
-selected_station_information = st.session_state.selected_station_information
+if st.session_state.station_id is not None:
+    station_id = st.session_state.station_id
+    selected_station_information = st.session_state.selected_station_information
 
-col1, col2 = st.columns(2)
-with col1:
-    st.write(f"Vous avez choisi la station **{station_name.strip()}** (id : {station_id})")
-with col2:
-    display_station_location(station_info=selected_station_information)
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write(f"Vous avez choisi la station **{station_name.strip()}** (id : {station_id})")
+    with col2:
+        display_station_location(station_info=selected_station_information)
 
-# Show availability
-selected_station_status = st.session_state.station_status_df[
-    st.session_state.station_status_df["station_id"] == station_id
-].to_dict(orient="records")[0]
-display_station_metrics(station_information=selected_station_information, station_status=selected_station_status)
+    # Show availability
+    selected_station_status = st.session_state.station_status_df[
+        st.session_state.station_status_df["station_id"] == station_id
+    ].to_dict(orient="records")[0]
+    display_station_metrics(station_information=selected_station_information, station_status=selected_station_status)
