@@ -133,3 +133,33 @@ with col2:
 # Show availability
 selected_station_status = station_status_df[station_status_df["station_id"] == station_id].to_dict(orient="records")[0]
 display_station_metrics(station_information=selected_station_information, station_status=selected_station_status)
+
+# Button to find nearest station with free space when station is full
+if selected_station_status["num_docks_available"] == 0:
+    st.warning("⚠️ Cette station est pleine, il n'y a pas de places libres pour déposer un vélo.")
+    if st.button("🔍 Trouver la station la plus proche avec des places libres", use_container_width=True):
+        nearest_station = utils.find_nearest_station_with_free_docks(
+            station_lat=selected_station_information["lat"],
+            station_lon=selected_station_information["lon"],
+            station_information_df=station_information_df,
+            station_status_df=station_status_df,
+            exclude_station_id=station_id
+        )
+        
+        if nearest_station:
+            st.success(f"✅ Station trouvée avec des places libres !")
+            st.divider()
+            st.subheader(f":bike: {get_language_text(nearest_station['name']).strip()}")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                st.write(f"**ID de la station** : {nearest_station['station_id']}")
+                if "address" in nearest_station:
+                    st.write(f"**Adresse** : {nearest_station['address']}")
+                st.write(f"**Coordonnées** : {nearest_station['lat']}, {nearest_station['lon']}")
+            with col2:
+                st.write(f"**Distance** : {nearest_station['distance_km']:.2f} km")
+                st.write(f"**Places libres** : {int(nearest_station['num_docks_available'])}")
+                st.write(f"**Capacité totale** : {nearest_station['capacity']}")
+        else:
+            st.error("❌ Aucune station avec des places libres n'a été trouvée dans le réseau.")
