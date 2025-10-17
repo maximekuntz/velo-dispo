@@ -16,6 +16,7 @@ GBFS_URLS = {
     "Strasbourg": "https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_ae/gbfs.json",
     "Tarbes": "https://api.gbfs.ecovelo.mobi/tlpmobilites/gbfs.json",
     "Epinal": "https://gbfs.partners.fifteen.eu/gbfs/epinal/gbfs.json",
+    "Fluo Grand Est": "https://gbfs.partners.fifteen.eu/gbfs/velo-fluo/gbfs.json",
     "La Bresse Gérardmer": "https://api.gbfs.v3.0.ecovelo.mobi/labresse/gbfs.json",
     "Valenciennes": "https://stables.donkey.bike/api/public/gbfs/2/donkey_valenciennes/gbfs",
     "Vichy": "https://gbfs.partners.fifteen.eu/gbfs/vichy/gbfs.json",
